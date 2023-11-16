@@ -12,13 +12,13 @@
  
 if("${FORTE_ARCHITECTURE}" STREQUAL "Zephyr")
 
-forte_add_io(ZEPHYR_MODULAR_IO "Support for Zephyr OS")
-if (FORTE_MODULE_ZEPHYR_MODULAR_IO)
+forte_add_io(ZEPHYR "Support for Zephyr OS")
+if (FORTE_IO_ZEPHYR)
 
 forte_add_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# forte_add_sourcefile_hcpp()
+forte_add_sourcefile_hcpp(Trovis5578ez_fbt)
 
-endif (FORTE_MODULE_ZEPHYR_MODULAR_IO)
+endif (FORTE_IO_ZEPHYR)
 
 endif("${FORTE_ARCHITECTURE}" STREQUAL "Zephyr")
