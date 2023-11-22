@@ -12,6 +12,8 @@ important benefit that you don't have to discover and set all the compiler paths
 In your app's CMakeLists.txt, add the following snippet:
 
 ```
+# 4diac FORTE as Zephyr library module
+
 zephyr_get_compile_definitions_for_lang_as_string(CXX cxx_definitions)
 zephyr_get_compile_options_for_lang_as_string(CXX cxx_options)
 zephyr_get_include_directories_for_lang_as_string(CXX cxx_includes)
@@ -38,23 +40,25 @@ ExternalProject_Add(forte
 			-DFORTE_ARCHITECTURE=Zephyr
 			-DFORTE_TESTS=OFF
 			-DFORTE_SUPPORT_BOOT_FILE=ON
-			-DFORTE_MODULE_CONVERT=ON
 			-DFORTE_BUILD_EXECUTABLE=OFF
 			-DFORTE_BUILD_STATIC_LIBRARY=ON
+			-DFORTE_MODULE_CONVERT=ON
 			-DFORTE_MODULE_IEC61131=ON
-			-DCMAKE_C_FLAGS_DEBUG="-g"
-			-DCMAKE_BUILD_TYPE=MINSIZEREL
-			-DFORTE_LOGLEVEL=NOLOG
+			-DFORTE_IO=ON
+			-DFORTE_IO_ZEPHYR=ON
 			-DFORTE_COM_ETH=ON
 			-DFORTE_COM_FBDK=ON
 			-DFORTE_COM_LOCAL=ON
 			-DFORTE_MODULE_UTILS=ON
-			-DFORTE_SOURCE_DIR=${forte_src_dir}
 			-DFORTE_EXTERNAL_MODULES_DIRECTORY=${forte_src_dir}/ExportedFBs
 			-DFORTE_MODULE_EXTERNAL_PIDS=ON
 			-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
 			-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+			-DFORTE_LOGLEVEL=NOLOG
+			-DCMAKE_BUILD_TYPE=MINSIZEREL
+			-DCMAKE_C_FLAGS_DEBUG="-g"
 			-DCMAKE_CXX_FLAGS=${external_project_cxxflags}
+			-DFORTE_SOURCE_DIR=${forte_src_dir}
 			../../
 	BUILD_COMMAND
 		ninja
@@ -67,6 +71,10 @@ add_dependencies(forte zephyr_interface)
 add_library(forte_lib STATIC IMPORTED GLOBAL)
 add_dependencies(forte_lib forte)
 set_target_properties(forte_lib PROPERTIES IMPORTED_LOCATION ${FORTE_LIB_DIR}/libforte-static.a)
+target_include_directories(forte_lib INTERFACE ${forte_src_dir}/src/arch)
+```
+
+```
 target_link_libraries(app PUBLIC forte_lib)
 ```
 
@@ -89,7 +97,6 @@ CONFIG_DYNAMIC_THREAD_ALLOC=y
 CONFIG_INIT_STACKS=y
 CONFIG_THREAD_STACK_INFO=y
 CONFIG_KERNEL_MEM_POOL=y
-CONFIG_HEAP_MEM_POOL_SIZE=64000
 
 # TCP/IP networking for 4diac FORTE
 CONFIG_NETWORKING=y
