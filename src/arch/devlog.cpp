@@ -96,7 +96,7 @@ void printLogMessage(E_MsgLevel paLevel, const char *paMessage) {
 #ifndef __ZEPHYR__
   fprintf(stderr, "%s: T#%" PRIuFAST64 ": %s", scLogLevel[static_cast<int>(paLevel)], getNanoSecondsMonotonic(), paMessage);
 #else
-  printk("%s: T#%" PRIuFAST64 ": %s", scLogLevel[static_cast<int>(paLevel)], getNanoSecondsMonotonic(), paMessage);
+  LOG_PRINTK("%s: T#%" PRIuFAST64 ": %s", scLogLevel[static_cast<int>(paLevel)], getNanoSecondsMonotonic(), paMessage);
 #endif // __ZEPHYR__
 }
 
