@@ -46,6 +46,10 @@
 #endif // FORTE_STACKTRACE_CXX23
 #endif // FORTE_STACKTRACE
 
+#ifdef __ZEPHYR__
+#include <zephyr/logging/log.h>
+#endif // __ZEPHYR__
+
 static const char* scLogLevel[] = { "INFO", "WARNING", "ERROR", "DEBUG", "TRACE" };
 
 //this define allows to provide an own log handler (see LMS for an example of this)
