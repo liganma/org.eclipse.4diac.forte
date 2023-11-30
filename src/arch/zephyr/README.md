@@ -83,6 +83,12 @@ Adapt the value of `forte_src_dir` to your actual FORTE source tree location.
 In your app's `prj.conf`, turn on the required C++ support:
 
 ```
+# Supporting FORTE logging system on Zephyr's logging subsys
+CONFIG_LOG=y
+CONFIG_LOG_MODE_IMMEDIATE=n
+CONFIG_LOG_BACKEND_UART=n
+CONFIG_SHELL_LOG_BACKEND=y
+
 # For C++ standard library support
 CONFIG_COMPILER_OPT="-Werror"
 CONFIG_POSIX_CLOCK=y
@@ -126,4 +132,3 @@ CONFIG_FLASH_PAGE_LAYOUT=y
 CONFIG_FILE_SYSTEM=y
 CONFIG_FILE_SYSTEM_LITTLEFS=y
 ```
-
