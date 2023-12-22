@@ -27,14 +27,17 @@ IOHandle::~IOHandle() {
 }
 
 void IOHandle::onObserver(IOObserver *paObserver) {
+  DEVLOG_INFO("IOHandle::onObserver\n");
   this->mObserver = paObserver;
 }
 
 void IOHandle::dropObserver() {
+  DEVLOG_INFO("IOHandle::dropObserver\n");
   this->mObserver = nullptr;
 }
 
 void IOHandle::onChange() {
+  DEVLOG_INFO("IOHandle::onChange\n");
   if(mObserver != nullptr && mObserver->onChange()) {
     mController->fireIndicationEvent(mObserver);
   }
