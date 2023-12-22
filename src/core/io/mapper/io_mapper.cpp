@@ -28,6 +28,7 @@ IOMapper::IOMapper() = default;
 IOMapper::~IOMapper() = default;
 
 bool IOMapper::registerHandle(std::string const &paId, IOHandle* paHandle) {
+  DEVLOG_INFO("IOMapper::registerHandle(%s)\n", paId.c_str());
   CCriticalRegion criticalRegion(mSyncMutex);
 
   // Check for duplicates
@@ -53,6 +54,7 @@ bool IOMapper::registerHandle(std::string const &paId, IOHandle* paHandle) {
 }
 
 void IOMapper::deregisterHandle(IOHandle* paHandle) {
+  DEVLOG_INFO("IOMapper::deregisterHandle\n");
   CCriticalRegion criticalRegion(mSyncMutex);
 
   for(THandleMap::iterator it = mHandles.begin(); it != mHandles.end(); ++it) {
@@ -72,6 +74,7 @@ void IOMapper::deregisterHandle(IOHandle* paHandle) {
 }
 
 void IOMapper::deregisterHandle(std::string const &paId) {
+  DEVLOG_INFO("IOMapper::deregisterHandle\n");
   CCriticalRegion criticalRegion(mSyncMutex);
 
   auto handleIt = mHandles.find(paId);
@@ -88,6 +91,7 @@ void IOMapper::deregisterHandle(std::string const &paId) {
 }
 
 bool IOMapper::registerObserver(std::string const &paId, IOObserver* paObserver) {
+  DEVLOG_INFO("IOMapper::registerObserver(%s)\n", paId.c_str());
   CCriticalRegion criticalRegion(mSyncMutex);
 
   // Check for duplicates
@@ -113,6 +117,7 @@ bool IOMapper::registerObserver(std::string const &paId, IOObserver* paObserver)
 }
 
 void IOMapper::deregisterObserver(IOObserver* paObserver) {
+  DEVLOG_INFO("IOMapper::deregisterObserver\n");
   CCriticalRegion criticalRegion(mSyncMutex);
 
   for(TObserverMap::iterator it = mObservers.begin(); it != mObservers.end(); ++it) {
