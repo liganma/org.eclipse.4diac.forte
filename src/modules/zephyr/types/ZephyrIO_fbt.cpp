@@ -39,7 +39,6 @@ const SFBInterfaceSpec FORTE_ZephyrIO::scmFBInterfaceSpec = {
 
 FORTE_ZephyrIO::FORTE_ZephyrIO(const CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer) :
     forte::core::io::IOConfigFBController(paContainer, &scmFBInterfaceSpec, paInstanceNameId),
-    mEventHandler{getExtEvHandler<ZephyrIODeviceController>(*this)},
     var_conn_QO(var_QO),
     var_conn_STATUS(var_STATUS),
     conn_INITO(this, 0),
@@ -65,9 +64,9 @@ void FORTE_ZephyrIO::setInitialValues() {
 
 void FORTE_ZephyrIO::deregister_handles() {
   for (size_t i = 0; i < pin_cnt; i++) {
-    if (mRegistered[i] != nullptr) {
-      IOMapper::getInstance().deregisterHandle(mRegistered[i]->getValue());
-      mRegistered[i] = nullptr;
+    if (!mRegistered[i].empty()) {
+      IOMapper::getInstance().deregisterHandle(mRegistered[i]);
+      mRegistered[i].clear();
     }
   }
 }
@@ -80,11 +79,13 @@ void FORTE_ZephyrIO::register_handles() {
     if (id->empty())
       continue;
 
-    mRegistered[i] = id;
+    mRegistered[i] = id->getValue();
 
-    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(id->getValue(), forte::core::io::IOMapper::In);
+    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
+      id->getValue(), forte::core::io::IOMapper::In, ZephyrIODeviceController::Bit);
 
-    IOMapper::getInstance().registerHandle(id->getValue(), mEventHandler.initHandle(&descr));
+    IOMapper::getInstance().registerHandle(id->getValue(),
+      static_cast<ZephyrIODeviceController*>(getDeviceController())->initHandle(&descr));
   }
   for (size_t i = 2; i <= 3; i++) {
     auto id = static_cast<CIEC_WSTRING*>(getDI(i));
@@ -93,20 +94,41 @@ void FORTE_ZephyrIO::register_handles() {
     if (id->empty())
       continue;
 
-    mRegistered[i] = id;
+    mRegistered[i] = id->getValue();
 
-    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(id->getValue(), forte::core::io::IOMapper::Out);
+    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
+      id->getValue(), forte::core::io::IOMapper::Out, ZephyrIODeviceController::Bit);
 
-    IOMapper::getInstance().registerHandle(id->getValue(), mEventHandler.initHandle(&descr));
+    IOMapper::getInstance().registerHandle(id->getValue(),
+      static_cast<ZephyrIODeviceController*>(getDeviceController())->initHandle(&descr));
   }
 }
 
 void FORTE_ZephyrIO::executeEvent(const TEventID paEIID, CEventChainExecutionThread *const paECET) {
   switch(paEIID) {
-    case scmEventINITID:
+    case cgExternalEventID: {
+      if (getDeviceController() &&
+        !(getDeviceController()->mNotificationHandled = handleNotification(getDeviceController()->mNotificationType, getDeviceController()->mNotificationAttachment, paECET))) {
+        DEVLOG_ERROR("[IOConfigFBController] Notification of type %d has not been handled.\n", static_cast<int>(getDeviceController()->mNotificationType));
+      }
+      break;
+    }
+    case scmEventINITID: {
       deregister_handles();
-      register_handles();
-      sendOutputEvent(scmEventINITOID, paECET);
+      if (true == QI()) {
+        if (init(paECET)) {
+          register_handles();
+        } else {
+          QO() = CIEC_BOOL(false);
+          sendOutputEvent(scmEventINITOID, paECET);
+        }
+      } else {
+        QO() = CIEC_BOOL(deInit(paECET));
+        sendOutputEvent(scmEventINITOID, paECET);
+      }
+      break;
+    }
+    default:
       break;
   }
 }
@@ -190,7 +212,12 @@ CDataConnection *FORTE_ZephyrIO::getDOConUnchecked(const TPortId paIndex) {
 }
 
 forte::core::io::IODeviceController* FORTE_ZephyrIO::createDeviceController(CDeviceExecution& paDeviceExecution) {
-  (void)paDeviceExecution;
-  return &mEventHandler;
+  return new ZephyrIODeviceController(paDeviceExecution);
+}
+
+void FORTE_ZephyrIO::setConfig() {
+  ZephyrIODeviceController::Config config;
+  config.updateInterval = var_UpdateInterval.getInMilliSeconds();
+  getDeviceController()->setConfig(&config);
 }
 

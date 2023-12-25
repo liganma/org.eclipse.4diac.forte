@@ -13,42 +13,39 @@ public:
 
   DECLARE_HANDLER(ZephyrIODeviceController);
 
+  struct Config : forte::core::io::IODeviceController::Config {
+    unsigned int updateInterval = 40; // Sets the period for the data update cycle. The default value is 40 ms.
+  };
+
+  enum HandleType {
+    Bit,
+  };
+
   class ZephyrIOHandleDescriptor
     : public forte::core::io::IODeviceController::HandleDescriptor {
   public:
+    HandleType mType;
+
     ZephyrIOHandleDescriptor(std::string const &paId,
-      forte::core::io::IOMapper::Direction paDirection)
-      : HandleDescriptor(paId, paDirection) { (void)paDirection; }
-
-    ZephyrIOHandleDescriptor(std::string const &paId)
-      : HandleDescriptor(paId, IOMapper::UnknownDirection) {}
+      forte::core::io::IOMapper::Direction paDirection, HandleType paType)
+      : HandleDescriptor(paId, paDirection), mType(paType) {}
   };
-
 
   IOHandle* initHandle(HandleDescriptor* paHandleDescriptor) override;
 
-  void setConfig(Config *paConfig) override {
-    (void)paConfig;
-    DEVLOG_INFO("ZephyrIOHandleDescriptor::setConfig\n");
-    if (isAlive()) {
-      DEVLOG_ERROR("ZephyrIOHandleDescriptor::setConfig: Cannot change configuration while running.\n");
-      return;
-    }
-  }
+  void setConfig(struct forte::core::io::IODeviceController::Config* paConfig) override;
+
+protected:
   const char *init() override {
-    DEVLOG_INFO("ZephyrIOHandleDescriptor::init\n");
-    const char *x = "";
-    return x;
+    DEVLOG_INFO("ZephyrIODeviceController::init\n");
+    return nullptr;
   }
-  void runLoop() override {
-    DEVLOG_INFO("ZephyrIOHandleDescriptor::runLoop\n");
-    while (isAlive()) {
-    }
-    DEVLOG_INFO("ZephyrIOHandleDescriptor::runLoop done\n");
-  }
+  void runLoop() override;
   void deInit() override {
-    DEVLOG_INFO("ZephyrIOHandleDescriptor::deInit\n");
+    DEVLOG_INFO("ZephyrIODeviceController::deInit\n");
   }
+
+  struct Config mConfig;
 };
 
 #endif /* ifndef ZEPHYRIO_DEVICE_CONTROLLER_H */
