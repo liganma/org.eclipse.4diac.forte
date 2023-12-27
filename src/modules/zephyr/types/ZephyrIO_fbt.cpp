@@ -52,6 +52,11 @@ FORTE_ZephyrIO::FORTE_ZephyrIO(const CStringDictionary::TStringId paInstanceName
     conn_STATUS(this, 1, &var_conn_STATUS) {
 };
 
+FORTE_ZephyrIO::~FORTE_ZephyrIO() {
+  DEVLOG_INFO("FORTE_ZephyrIO dtor\n");
+  deregister_handles();
+}
+
 void FORTE_ZephyrIO::setInitialValues() {
   var_QI = 0_BOOL;
   var_IN1 = u""_WSTRING;
@@ -64,9 +69,10 @@ void FORTE_ZephyrIO::setInitialValues() {
 
 void FORTE_ZephyrIO::deregister_handles() {
   for (size_t i = 0; i < pin_cnt; i++) {
-    if (!mRegistered[i].empty()) {
+    if (mRegistered[i] != nullptr) {
       IOMapper::getInstance().deregisterHandle(mRegistered[i]);
-      mRegistered[i].clear();
+      delete mRegistered[i];
+      mRegistered[i] = nullptr;
     }
   }
 }
@@ -79,13 +85,13 @@ void FORTE_ZephyrIO::register_handles() {
     if (id->empty())
       continue;
 
-    mRegistered[i] = id->getValue();
-
     ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
       id->getValue(), forte::core::io::IOMapper::In, ZephyrIODeviceController::Bit);
 
-    IOMapper::getInstance().registerHandle(id->getValue(),
-      static_cast<ZephyrIODeviceController*>(getDeviceController())->initHandle(&descr));
+    auto handle = static_cast<ZephyrIODeviceController*>(getDeviceController())->initHandle(&descr);
+    IOMapper::getInstance().registerHandle(id->getValue(), handle);
+
+    mRegistered[i] = handle;
   }
   for (size_t i = 2; i <= 3; i++) {
     auto id = static_cast<CIEC_WSTRING*>(getDI(i));
@@ -94,13 +100,14 @@ void FORTE_ZephyrIO::register_handles() {
     if (id->empty())
       continue;
 
-    mRegistered[i] = id->getValue();
 
     ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
       id->getValue(), forte::core::io::IOMapper::Out, ZephyrIODeviceController::Bit);
 
-    IOMapper::getInstance().registerHandle(id->getValue(),
-      static_cast<ZephyrIODeviceController*>(getDeviceController())->initHandle(&descr));
+    auto handle = static_cast<ZephyrIODeviceController*>(getDeviceController())->initHandle(&descr);
+    IOMapper::getInstance().registerHandle(id->getValue(), handle);
+
+    mRegistered[i] = handle;
   }
 }
 

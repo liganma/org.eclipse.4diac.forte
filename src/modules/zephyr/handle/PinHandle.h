@@ -15,6 +15,7 @@ class IOHandleGPIO : public forte::core::io::IOHandle {
 
 public:
   IOHandleGPIO(ZephyrIODeviceController *paDeviceCtrl);
+  ~IOHandleGPIO() override;
   void get(CIEC_ANY &) override;
   void set(const CIEC_ANY &) override;
 

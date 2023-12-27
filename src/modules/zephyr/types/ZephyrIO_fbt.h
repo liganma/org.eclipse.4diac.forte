@@ -28,6 +28,7 @@
 class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
   DECLARE_FIRMWARE_FB(FORTE_ZephyrIO)
 
+  using IOHandle = forte::core::io::IOHandle;
   using IOMapper = forte::core::io::IOMapper;
 
   private:
@@ -49,7 +50,7 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
 
     // The (maximum) number of IO pins available on a GPIO port.
     static constexpr size_t pin_cnt = 16;
-    std::array<std::string, pin_cnt> mRegistered;
+    std::array<IOHandle*, pin_cnt> mRegistered;
 
     void deregister_handles();
     void register_handles();
@@ -65,6 +66,7 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
 
   public:
     FORTE_ZephyrIO(CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer);
+    ~FORTE_ZephyrIO() override;
 
     CIEC_BOOL var_QI;
     CIEC_WSTRING var_IN1;
@@ -111,5 +113,4 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
       evt_INIT(paQI, paIN1, paOUT1, paOUT2, paUpdateInterval, paQO, paSTATUS);
     }
 };
-
 
