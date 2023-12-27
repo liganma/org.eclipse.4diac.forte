@@ -3,6 +3,10 @@
 IOHandleGPIO::IOHandleGPIO(ZephyrIODeviceController *paDeviceCtrl)
     : IOHandle(static_cast<forte::core::io::IODeviceController*>(paDeviceCtrl), IOMapper::UnknownDirection, CIEC_ANY::e_BOOL) {}
 
+IOHandleGPIO::~IOHandleGPIO() {
+  DEVLOG_INFO("IOHandleGPIO dtor\n");
+}
+
 void IOHandleGPIO::onObserver(IOObserver *paObserver) {
   DEVLOG_INFO("IOHandleGPIO::onObserver\n");
   IOHandle::onObserver(paObserver);

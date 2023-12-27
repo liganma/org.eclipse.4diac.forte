@@ -8,7 +8,9 @@ ZephyrIODeviceController::ZephyrIODeviceController(CDeviceExecution& paDeviceExe
 : forte::core::io::IODeviceController(paDeviceExecution){
 }
 
-ZephyrIODeviceController::~ZephyrIODeviceController() {}
+ZephyrIODeviceController::~ZephyrIODeviceController() {
+  DEVLOG_INFO("ZephyrIODeviceController dtor\n");
+}
 
 ZephyrIODeviceController::IOHandle *
 ZephyrIODeviceController::initHandle(HandleDescriptor *paHandleDescriptor) {
