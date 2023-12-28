@@ -48,21 +48,13 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
 
     static const SFBInterfaceSpec scmFBInterfaceSpec;
 
-    // The (maximum) number of IO pins available on a GPIO port.
-    static constexpr size_t pin_cnt = 16;
-    std::array<IOHandle*, pin_cnt> mRegistered;
-
-    void deregister_handles();
-    void register_handles();
-
-    void executeEvent(TEventID paEIID, CEventChainExecutionThread *const paECET) override;
-
     void readInputData(TEventID paEIID) override;
     void writeOutputData(TEventID paEIID) override;
     void setInitialValues() override;
 
     forte::core::io::IODeviceController* createDeviceController(CDeviceExecution& paDeviceExecution) override;
     void setConfig() override;
+    void onStartup(CEventChainExecutionThread * const paECET) override;
 
   public:
     FORTE_ZephyrIO(CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer);

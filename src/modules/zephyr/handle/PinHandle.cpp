@@ -1,7 +1,7 @@
 #include "PinHandle.h"
-
-IOHandleGPIO::IOHandleGPIO(ZephyrIODeviceController *paDeviceCtrl)
-    : IOHandle(static_cast<forte::core::io::IODeviceController*>(paDeviceCtrl), IOMapper::UnknownDirection, CIEC_ANY::e_BOOL) {}
+ 
+IOHandleGPIO::IOHandleGPIO(ZephyrIODeviceController *paDeviceCtrl, IOMapper::Direction paDirection) :
+  IOHandle(paDeviceCtrl, paDirection, CIEC_ANY::e_BOOL) {}
 
 IOHandleGPIO::~IOHandleGPIO() {
   DEVLOG_INFO("IOHandleGPIO dtor\n");
