@@ -14,10 +14,8 @@ ZephyrIODeviceController::~ZephyrIODeviceController() {
 
 ZephyrIODeviceController::IOHandle *
 ZephyrIODeviceController::initHandle(HandleDescriptor *paHandleDescriptor) {
-  DEVLOG_INFO("ZephyrIODeviceController::initHandle\n");
   auto desc = static_cast<ZephyrIOHandleDescriptor *>(paHandleDescriptor);
-  (void)desc;
-  IOHandle *handle = new IOHandleGPIO(this);
+  IOHandle *handle = new IOHandleGPIO(this, desc->mDirection);
   return static_cast<IOHandle *>(handle);
 }
 
