@@ -35,6 +35,8 @@ public:
 
   void setConfig(struct forte::core::io::IODeviceController::Config* paConfig) override;
 
+  void handleChangeEvent(IOHandle *paHandle) override;
+
 protected:
   const char *init() override {
     DEVLOG_INFO("ZephyrIODeviceController::init\n");
@@ -46,6 +48,7 @@ protected:
   }
 
   struct Config mConfig;
+  CSemaphore mUpdateSema;
 };
 
 #endif /* ifndef ZEPHYRIO_DEVICE_CONTROLLER_H */
