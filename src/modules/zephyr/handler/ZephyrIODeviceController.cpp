@@ -28,10 +28,20 @@ void ZephyrIODeviceController::setConfig(struct forte::core::io::IODeviceControl
   mConfig = *static_cast<Config*>(paConfig);
 }
 
+void ZephyrIODeviceController::handleChangeEvent(IOHandle* paHandle) {
+  (void)paHandle;
+  mUpdateSema.inc();
+}
+
 void ZephyrIODeviceController::runLoop() {
   DEVLOG_INFO("ZephyrIOHandleDeviceController::runLoop\n");
-  while (isAlive()) {
-    CThread::sleepThread(mConfig.updateInterval);
+  while(isAlive()) {
+    mUpdateSema.timedWait(mConfig.updateInterval * 1000U); // update interval ms to us
+
+    if(hasError()) {
+      break;
+    }
+
   }
   DEVLOG_INFO("ZephyrIODeviceController::runLoop done\n");
 }
