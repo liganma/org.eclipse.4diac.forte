@@ -24,6 +24,7 @@ forte_add_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(handler)
 forte_add_sourcefile_hcpp(handle/PinHandle)
 forte_add_sourcefile_hcpp(types/ZephyrIO_fbt)
+forte_add_sourcefile_hcpp(types/io/zephyr/HandleDescriptor_dtp)
 
 endif(FORTE_IO_ZEPHYR)
 endif("${FORTE_ARCHITECTURE}" STREQUAL "Zephyr")

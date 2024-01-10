@@ -18,11 +18,11 @@
 
 DEFINE_FIRMWARE_FB(FORTE_ZephyrIO, g_nStringIdZephyrIO)
 
-const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataInputNames[] = {g_nStringIdQI, g_nStringIdIN1, g_nStringIdOUT1, g_nStringIdOUT2, g_nStringIdUpdateInterval};
-const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataInputTypeIds[] = {g_nStringIdBOOL, g_nStringIdWSTRING, g_nStringIdWSTRING, g_nStringIdWSTRING, g_nStringIdTIME};
+const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataInputNames[] = {g_nStringIdQI, g_nStringIdgpio4_3, g_nStringIdgpio4_7, g_nStringIddesc_gpio4_3, g_nStringIddesc_gpio4_7, g_nStringIdUpdateInterval};
+const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataInputTypeIds[] = {g_nStringIdBOOL, g_nStringIdWSTRING, g_nStringIdWSTRING, g_nStringIdHandleDescriptor, g_nStringIdHandleDescriptor, g_nStringIdTIME};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataOutputNames[] = {g_nStringIdQO, g_nStringIdSTATUS};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataOutputTypeIds[] = {g_nStringIdBOOL, g_nStringIdWSTRING};
-const TDataIOID FORTE_ZephyrIO::scmEIWith[] = {0, 1, 2, 3, 4, scmWithListDelimiter};
+const TDataIOID FORTE_ZephyrIO::scmEIWith[] = {0, 1, 2, 5, 4, 3, scmWithListDelimiter};
 const TForteInt16 FORTE_ZephyrIO::scmEIWithIndexes[] = {0};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmEventInputNames[] = {g_nStringIdINIT};
 const TDataIOID FORTE_ZephyrIO::scmEOWith[] = {0, 1, scmWithListDelimiter, 0, 1, scmWithListDelimiter};
@@ -31,7 +31,7 @@ const CStringDictionary::TStringId FORTE_ZephyrIO::scmEventOutputNames[] = {g_nS
 const SFBInterfaceSpec FORTE_ZephyrIO::scmFBInterfaceSpec = {
   1, scmEventInputNames, scmEIWith, scmEIWithIndexes,
   2, scmEventOutputNames, scmEOWith, scmEOWithIndexes,
-  5, scmDataInputNames, scmDataInputTypeIds,
+  6, scmDataInputNames, scmDataInputTypeIds,
   2, scmDataOutputNames, scmDataOutputTypeIds,
   0, nullptr,
   0, nullptr
@@ -44,9 +44,10 @@ FORTE_ZephyrIO::FORTE_ZephyrIO(const CStringDictionary::TStringId paInstanceName
     conn_INITO(this, 0),
     conn_IND(this, 1),
     conn_QI(nullptr),
-    conn_IN1(nullptr),
-    conn_OUT1(nullptr),
-    conn_OUT2(nullptr),
+    conn_gpio4_3(nullptr),
+    conn_gpio4_7(nullptr),
+    conn_desc_gpio4_3(nullptr),
+    conn_desc_gpio4_7(nullptr),
     conn_UpdateInterval(nullptr),
     conn_QO(this, 0, &var_conn_QO),
     conn_STATUS(this, 1, &var_conn_STATUS) {
@@ -58,9 +59,10 @@ FORTE_ZephyrIO::~FORTE_ZephyrIO() {
 
 void FORTE_ZephyrIO::setInitialValues() {
   var_QI = 0_BOOL;
-  var_IN1 = u""_WSTRING;
-  var_OUT1 = u""_WSTRING;
-  var_OUT2 = u""_WSTRING;
+  var_gpio4_3 = u""_WSTRING;
+  var_gpio4_7 = u""_WSTRING;
+  var_desc_gpio4_3 = CIEC_HandleDescriptor();
+  var_desc_gpio4_7 = CIEC_HandleDescriptor();
   var_UpdateInterval = 0_TIME;
   var_QO = 0_BOOL;
   var_STATUS = u""_WSTRING;
@@ -70,10 +72,11 @@ void FORTE_ZephyrIO::readInputData(const TEventID paEIID) {
   switch(paEIID) {
     case scmEventINITID: {
       readData(0, var_QI, conn_QI);
-      readData(1, var_IN1, conn_IN1);
-      readData(2, var_OUT1, conn_OUT1);
-      readData(3, var_OUT2, conn_OUT2);
-      readData(4, var_UpdateInterval, conn_UpdateInterval);
+      readData(1, var_gpio4_3, conn_gpio4_3);
+      readData(2, var_gpio4_7, conn_gpio4_7);
+      readData(5, var_UpdateInterval, conn_UpdateInterval);
+      readData(4, var_desc_gpio4_7, conn_desc_gpio4_7);
+      readData(3, var_desc_gpio4_3, conn_desc_gpio4_3);
       break;
     }
     default:
@@ -101,10 +104,11 @@ void FORTE_ZephyrIO::writeOutputData(const TEventID paEIID) {
 CIEC_ANY *FORTE_ZephyrIO::getDI(const size_t paIndex) {
   switch(paIndex) {
     case 0: return &var_QI;
-    case 1: return &var_IN1;
-    case 2: return &var_OUT1;
-    case 3: return &var_OUT2;
-    case 4: return &var_UpdateInterval;
+    case 1: return &var_gpio4_3;
+    case 2: return &var_gpio4_7;
+    case 3: return &var_desc_gpio4_3;
+    case 4: return &var_desc_gpio4_7;
+    case 5: return &var_UpdateInterval;
   }
   return nullptr;
 }
@@ -128,10 +132,11 @@ CEventConnection *FORTE_ZephyrIO::getEOConUnchecked(const TPortId paIndex) {
 CDataConnection **FORTE_ZephyrIO::getDIConUnchecked(const TPortId paIndex) {
   switch(paIndex) {
     case 0: return &conn_QI;
-    case 1: return &conn_IN1;
-    case 2: return &conn_OUT1;
-    case 3: return &conn_OUT2;
-    case 4: return &conn_UpdateInterval;
+    case 1: return &conn_gpio4_3;
+    case 2: return &conn_gpio4_7;
+    case 3: return &conn_desc_gpio4_3;
+    case 4: return &conn_desc_gpio4_7;
+    case 5: return &conn_UpdateInterval;
   }
   return nullptr;
 }
@@ -157,22 +162,13 @@ void FORTE_ZephyrIO::setConfig() {
 void FORTE_ZephyrIO::onStartup(CEventChainExecutionThread * const paECET) {
   // Initialize handles
   size_t initialDIOffset = 1;
-  size_t numberOfInputs = 1;
-  size_t numberOfOutputs = 2;
+  size_t numberOfIOs = 2;
 
-  for (size_t i = 0; i < numberOfInputs; i++) {
+  for (size_t i = 0; i < numberOfIOs; i++) {
     std::string id = static_cast<CIEC_WSTRING*>(getDI(initialDIOffset + i))->getValue();
 
     ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
       id, forte::core::io::IOMapper::In, ZephyrIODeviceController::Bit);
-
-    initHandle(&descr);
-  }
-  for (size_t i = 0; i < numberOfOutputs; i++) {
-    std::string id = static_cast<CIEC_WSTRING*>(getDI(initialDIOffset + numberOfInputs + i))->getValue();
-
-    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
-      id, forte::core::io::IOMapper::Out, ZephyrIODeviceController::Bit);
 
     initHandle(&descr);
   }
