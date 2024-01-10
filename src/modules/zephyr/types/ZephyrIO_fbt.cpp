@@ -25,12 +25,12 @@ const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataOutputTypeIds[] = {g_n
 const TDataIOID FORTE_ZephyrIO::scmEIWith[] = {0, 1, 2, 5, 4, 3, scmWithListDelimiter};
 const TForteInt16 FORTE_ZephyrIO::scmEIWithIndexes[] = {0};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmEventInputNames[] = {g_nStringIdINIT};
-const TDataIOID FORTE_ZephyrIO::scmEOWith[] = {0, 1, scmWithListDelimiter, 0, 1, scmWithListDelimiter};
-const TForteInt16 FORTE_ZephyrIO::scmEOWithIndexes[] = {0, 3};
-const CStringDictionary::TStringId FORTE_ZephyrIO::scmEventOutputNames[] = {g_nStringIdINITO, g_nStringIdIND};
+const TDataIOID FORTE_ZephyrIO::scmEOWith[] = {0, 1, scmWithListDelimiter};
+const TForteInt16 FORTE_ZephyrIO::scmEOWithIndexes[] = {0};
+const CStringDictionary::TStringId FORTE_ZephyrIO::scmEventOutputNames[] = {g_nStringIdINITO};
 const SFBInterfaceSpec FORTE_ZephyrIO::scmFBInterfaceSpec = {
   1, scmEventInputNames, scmEIWith, scmEIWithIndexes,
-  2, scmEventOutputNames, scmEOWith, scmEOWithIndexes,
+  1, scmEventOutputNames, scmEOWith, scmEOWithIndexes,
   6, scmDataInputNames, scmDataInputTypeIds,
   2, scmDataOutputNames, scmDataOutputTypeIds,
   0, nullptr,
@@ -39,10 +39,10 @@ const SFBInterfaceSpec FORTE_ZephyrIO::scmFBInterfaceSpec = {
 
 FORTE_ZephyrIO::FORTE_ZephyrIO(const CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer) :
     forte::core::io::IOConfigFBController(paContainer, &scmFBInterfaceSpec, paInstanceNameId),
+    var_UpdateInterval(40000000_TIME),
     var_conn_QO(var_QO),
     var_conn_STATUS(var_STATUS),
     conn_INITO(this, 0),
-    conn_IND(this, 1),
     conn_QI(nullptr),
     conn_gpio4_3(nullptr),
     conn_gpio4_7(nullptr),
@@ -63,7 +63,7 @@ void FORTE_ZephyrIO::setInitialValues() {
   var_gpio4_7 = u""_WSTRING;
   var_desc_gpio4_3 = CIEC_HandleDescriptor();
   var_desc_gpio4_7 = CIEC_HandleDescriptor();
-  var_UpdateInterval = 0_TIME;
+  var_UpdateInterval = 40000000_TIME;
   var_QO = 0_BOOL;
   var_STATUS = u""_WSTRING;
 }
@@ -87,11 +87,6 @@ void FORTE_ZephyrIO::readInputData(const TEventID paEIID) {
 void FORTE_ZephyrIO::writeOutputData(const TEventID paEIID) {
   switch(paEIID) {
     case scmEventINITOID: {
-      writeData(0, var_QO, conn_QO);
-      writeData(1, var_STATUS, conn_STATUS);
-      break;
-    }
-    case scmEventINDID: {
       writeData(0, var_QO, conn_QO);
       writeData(1, var_STATUS, conn_STATUS);
       break;
@@ -124,7 +119,6 @@ CIEC_ANY *FORTE_ZephyrIO::getDO(const size_t paIndex) {
 CEventConnection *FORTE_ZephyrIO::getEOConUnchecked(const TPortId paIndex) {
   switch(paIndex) {
     case 0: return &conn_INITO;
-    case 1: return &conn_IND;
   }
   return nullptr;
 }
@@ -166,9 +160,23 @@ void FORTE_ZephyrIO::onStartup(CEventChainExecutionThread * const paECET) {
 
   for (size_t i = 0; i < numberOfIOs; i++) {
     std::string id = static_cast<CIEC_WSTRING*>(getDI(initialDIOffset + i))->getValue();
+    IOMapper::Direction direction;
+    switch (static_cast<CIEC_HandleDescriptor*>(getDI(initialDIOffset + numberOfIOs + i))->var_Direction) {
+    case 1:
+      direction = IOMapper::In;
+      break;
+    case 2:
+      direction = IOMapper::Out;
+      break;
+    case 3:
+      direction = IOMapper::InOut;
+      break;
+    default:
+      direction = IOMapper::UnknownDirection;
+      break;
+    }
 
-    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(
-      id, forte::core::io::IOMapper::In, ZephyrIODeviceController::Bit);
+    ZephyrIODeviceController::ZephyrIOHandleDescriptor descr(id, direction, ZephyrIODeviceController::Bit);
 
     initHandle(&descr);
   }

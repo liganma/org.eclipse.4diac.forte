@@ -35,14 +35,31 @@ void ZephyrIODeviceController::handleChangeEvent(IOHandle* paHandle) {
 
 void ZephyrIODeviceController::runLoop() {
   DEVLOG_INFO("ZephyrIOHandleDeviceController::runLoop\n");
-  while(isAlive()) {
-    mUpdateSema.timedWait(mConfig.updateInterval * 1000U); // update interval ms to us
+  while (isAlive()) {
+    if (mConfig.updateInterval > 0) {
+      mUpdateSema.timedWait(mConfig.updateInterval * 1000000ULL); // update interval ms to ns
+    } else {
+      mUpdateSema.waitIndefinitely();
+    }
 
-    if(hasError()) {
+    checkForInputChanges();
+
+    if (hasError()) {
       break;
     }
 
   }
   DEVLOG_INFO("ZephyrIODeviceController::runLoop done\n");
+}
+
+bool ZephyrIODeviceController::isHandleValueEqual(IOHandle* paHandle) {
+  switch(paHandle->getIOHandleDataType()) {
+  case CIEC_ANY::e_BOOL:
+    return static_cast<IOHandleGPIO*>(paHandle)->equal();
+    break;
+  default:
+    return false;
+    break;
+  }
 }
 

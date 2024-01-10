@@ -18,12 +18,14 @@ public:
   ~IOHandleGPIO() override;
   void get(CIEC_ANY &) override;
   void set(const CIEC_ANY &) override;
+  bool equal();
 
 protected:
   void onObserver(IOObserver *paObserver) override;
   void dropObserver() override;
 
 private:
+  CIEC_BOOL mLastValue;
 };
 
 #endif

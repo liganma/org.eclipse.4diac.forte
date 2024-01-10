@@ -27,7 +27,18 @@ void IOHandleGPIO::get(CIEC_ANY &paState) {
 void IOHandleGPIO::set(const CIEC_ANY &paState) {
   (void)paState;
   DEVLOG_INFO("IOHandleGPIO::set\n");
+  mController->handleChangeEvent(this);
 }
-          
+
+bool IOHandleGPIO::equal() {
+  bool eq;
+  CIEC_BOOL value;
+  DEVLOG_INFO("IOHandleGPIO::equal\n");
+  get(value);
+  eq = (value == mLastValue);
+  if (!eq) mLastValue.setValue(value);
+  return eq;
+}
+
 // void forte::core::io::IOHandle::onChange()
 // Use this to notify IOHandle of asynchronous value changes, i.e. IRQs

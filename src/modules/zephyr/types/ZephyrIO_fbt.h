@@ -42,7 +42,6 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     static const TForteInt16 scmEIWithIndexes[];
     static const CStringDictionary::TStringId scmEventInputNames[];
     static const TEventID scmEventINITOID = 0;
-    static const TEventID scmEventINDID = 1;
     static const TDataIOID scmEOWith[];
     static const TForteInt16 scmEOWithIndexes[];
     static const CStringDictionary::TStringId scmEventOutputNames[];
@@ -75,7 +74,6 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     CIEC_WSTRING var_conn_STATUS;
 
     CEventConnection conn_INITO;
-    CEventConnection conn_IND;
 
     CDataConnection *conn_QI;
     CDataConnection *conn_gpio4_3;
