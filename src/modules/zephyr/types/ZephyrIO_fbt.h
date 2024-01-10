@@ -14,6 +14,7 @@
 #include "funcbloc.h"
 #include "forte_bool.h"
 #include "forte_wstring.h"
+#include "HandleDescriptor_dtp.h"
 #include "forte_time.h"
 #include "iec61131_functions.h"
 #include "forte_array_common.h"
@@ -61,9 +62,10 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     ~FORTE_ZephyrIO() override;
 
     CIEC_BOOL var_QI;
-    CIEC_WSTRING var_IN1;
-    CIEC_WSTRING var_OUT1;
-    CIEC_WSTRING var_OUT2;
+    CIEC_WSTRING var_gpio4_3;
+    CIEC_WSTRING var_gpio4_7;
+    CIEC_HandleDescriptor var_desc_gpio4_3;
+    CIEC_HandleDescriptor var_desc_gpio4_7;
     CIEC_TIME var_UpdateInterval;
 
     CIEC_BOOL var_QO;
@@ -76,9 +78,10 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     CEventConnection conn_IND;
 
     CDataConnection *conn_QI;
-    CDataConnection *conn_IN1;
-    CDataConnection *conn_OUT1;
-    CDataConnection *conn_OUT2;
+    CDataConnection *conn_gpio4_3;
+    CDataConnection *conn_gpio4_7;
+    CDataConnection *conn_desc_gpio4_3;
+    CDataConnection *conn_desc_gpio4_7;
     CDataConnection *conn_UpdateInterval;
 
     CDataConnection conn_QO;
@@ -90,19 +93,21 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     CDataConnection **getDIConUnchecked(TPortId) override;
     CDataConnection *getDOConUnchecked(TPortId) override;
 
-    void evt_INIT(const CIEC_BOOL &paQI, const CIEC_WSTRING &paIN1, const CIEC_WSTRING &paOUT1, const CIEC_WSTRING &paOUT2, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
+    void evt_INIT(const CIEC_BOOL &paQI, const CIEC_WSTRING &pagpio4_3, const CIEC_WSTRING &pagpio4_7, const CIEC_HandleDescriptor &padesc_gpio4_3, const CIEC_HandleDescriptor &padesc_gpio4_7, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
       var_QI = paQI;
-      var_IN1 = paIN1;
-      var_OUT1 = paOUT1;
-      var_OUT2 = paOUT2;
+      var_gpio4_3 = pagpio4_3;
+      var_gpio4_7 = pagpio4_7;
+      var_desc_gpio4_3 = padesc_gpio4_3;
+      var_desc_gpio4_7 = padesc_gpio4_7;
       var_UpdateInterval = paUpdateInterval;
       executeEvent(scmEventINITID, nullptr);
       paQO = var_QO;
       paSTATUS = var_STATUS;
     }
 
-    void operator()(const CIEC_BOOL &paQI, const CIEC_WSTRING &paIN1, const CIEC_WSTRING &paOUT1, const CIEC_WSTRING &paOUT2, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
-      evt_INIT(paQI, paIN1, paOUT1, paOUT2, paUpdateInterval, paQO, paSTATUS);
+    void operator()(const CIEC_BOOL &paQI, const CIEC_WSTRING &pagpio4_3, const CIEC_WSTRING &pagpio4_7, const CIEC_HandleDescriptor &padesc_gpio4_3, const CIEC_HandleDescriptor &padesc_gpio4_7, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
+      evt_INIT(paQI, pagpio4_3, pagpio4_7, padesc_gpio4_3, padesc_gpio4_7, paUpdateInterval, paQO, paSTATUS);
     }
 };
+
 
