@@ -14,7 +14,7 @@ public:
   DECLARE_HANDLER(ZephyrIODeviceController);
 
   struct Config : forte::core::io::IODeviceController::Config {
-    unsigned int updateInterval = 40; // Sets the period for the data update cycle. The default value is 40 ms.
+    unsigned int updateInterval = 0; // Sets the period for the data update cycle, default 0 means infinite.
   };
 
   enum HandleType {
@@ -46,6 +46,8 @@ protected:
   void deInit() override {
     DEVLOG_INFO("ZephyrIODeviceController::deInit\n");
   }
+
+  bool isHandleValueEqual(IOHandle* paHandle) override;
 
   struct Config mConfig;
   CSemaphore mUpdateSema;
