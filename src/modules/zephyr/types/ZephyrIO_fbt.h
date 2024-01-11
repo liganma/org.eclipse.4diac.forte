@@ -4,33 +4,17 @@
  *** This file was generated using the 4DIAC FORTE Export Filter V1.0.x NG!
  ***
  *** Name: ZephyrIO
- *** Description: Service Interface Function Block Type
+ *** Description: Template for Modular IO with boards running Zephyr OS
  *** Version:
- ***     1.0: 2023-11-15/kaar -  -
+ ***     1.0: 2024-01-12/Dirk Kaar -  -
  *************************************************************************/
 
 #pragma once
 
-#include "funcbloc.h"
-#include "forte_bool.h"
-#include "forte_wstring.h"
-#include "HandleDescriptor_dtp.h"
-#include "forte_time.h"
-#include "iec61131_functions.h"
-#include "forte_array_common.h"
-#include "forte_array.h"
-#include "forte_array_fixed.h"
-#include "forte_array_variable.h"
-#include "core/io/configFB/io_configFB_controller.h"
-#include <extevhandlerhelper.h>
-#include "handler/ZephyrIODeviceController.h"
+#include "ZephyrIOBase.h"
 
-
-class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
+class FORTE_ZephyrIO final : public FORTE_ZephyrIOBase {
   DECLARE_FIRMWARE_FB(FORTE_ZephyrIO)
-
-  using IOHandle = forte::core::io::IOHandle;
-  using IOMapper = forte::core::io::IOMapper;
 
   private:
     static const CStringDictionary::TStringId scmDataInputNames[];
@@ -52,19 +36,14 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     void writeOutputData(TEventID paEIID) override;
     void setInitialValues() override;
 
-    forte::core::io::IODeviceController* createDeviceController(CDeviceExecution& paDeviceExecution) override;
-    void setConfig() override;
+    static constexpr size_t numberOfIOs = 0;
+
     void onStartup(CEventChainExecutionThread * const paECET) override;
 
   public:
     FORTE_ZephyrIO(CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer);
-    ~FORTE_ZephyrIO() override;
 
     CIEC_BOOL var_QI;
-    CIEC_WSTRING var_gpio4_3;
-    CIEC_WSTRING var_gpio4_7;
-    CIEC_HandleDescriptor var_desc_gpio4_3;
-    CIEC_HandleDescriptor var_desc_gpio4_7;
     CIEC_TIME var_UpdateInterval;
 
     CIEC_BOOL var_QO;
@@ -76,10 +55,6 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     CEventConnection conn_INITO;
 
     CDataConnection *conn_QI;
-    CDataConnection *conn_gpio4_3;
-    CDataConnection *conn_gpio4_7;
-    CDataConnection *conn_desc_gpio4_3;
-    CDataConnection *conn_desc_gpio4_7;
     CDataConnection *conn_UpdateInterval;
 
     CDataConnection conn_QO;
@@ -91,20 +66,16 @@ class FORTE_ZephyrIO final : public forte::core::io::IOConfigFBController {
     CDataConnection **getDIConUnchecked(TPortId) override;
     CDataConnection *getDOConUnchecked(TPortId) override;
 
-    void evt_INIT(const CIEC_BOOL &paQI, const CIEC_WSTRING &pagpio4_3, const CIEC_WSTRING &pagpio4_7, const CIEC_HandleDescriptor &padesc_gpio4_3, const CIEC_HandleDescriptor &padesc_gpio4_7, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
+    void evt_INIT(const CIEC_BOOL &paQI, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
       var_QI = paQI;
-      var_gpio4_3 = pagpio4_3;
-      var_gpio4_7 = pagpio4_7;
-      var_desc_gpio4_3 = padesc_gpio4_3;
-      var_desc_gpio4_7 = padesc_gpio4_7;
       var_UpdateInterval = paUpdateInterval;
       executeEvent(scmEventINITID, nullptr);
       paQO = var_QO;
       paSTATUS = var_STATUS;
     }
 
-    void operator()(const CIEC_BOOL &paQI, const CIEC_WSTRING &pagpio4_3, const CIEC_WSTRING &pagpio4_7, const CIEC_HandleDescriptor &padesc_gpio4_3, const CIEC_HandleDescriptor &padesc_gpio4_7, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
-      evt_INIT(paQI, pagpio4_3, pagpio4_7, padesc_gpio4_3, padesc_gpio4_7, paUpdateInterval, paQO, paSTATUS);
+    void operator()(const CIEC_BOOL &paQI, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_WSTRING &paSTATUS) {
+      evt_INIT(paQI, paUpdateInterval, paQO, paSTATUS);
     }
 };
 
