@@ -11,20 +11,30 @@
 #############################################################################
 
 if ("${FORTE_ARCHITECTURE}" STREQUAL "Zephyr")
-forte_add_io(ZEPHYR "Support for the Zephyr OS")
-
-if(FORTE_IO_ZEPHYR)
 
 forte_add_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 #############################################################################
-# Zephyr FBs
+# Zephyr FBs Base
 #############################################################################
 
 add_subdirectory(handler)
-forte_add_sourcefile_hcpp(handle/PinHandle)
+add_subdirectory(handle)
+forte_add_sourcefile_hcpp(types/ZephyrIOBase)
+
+#############################################################################
+# Zephyr template FBs
+#############################################################################
+
+forte_add_io(ZEPHYR "Support for the Zephyr template board")
+
+if(FORTE_IO_ZEPHYR)
+
 forte_add_sourcefile_hcpp(types/ZephyrIO_fbt)
-forte_add_sourcefile_hcpp(types/HandleDescriptor_dtp)
 
 endif(FORTE_IO_ZEPHYR)
+
+#############################################################################
+
 endif("${FORTE_ARCHITECTURE}" STREQUAL "Zephyr")
+
