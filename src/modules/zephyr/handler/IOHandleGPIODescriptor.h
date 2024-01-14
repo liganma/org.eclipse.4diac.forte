@@ -14,11 +14,25 @@
 #define IOHANDLEGPIODESCRIPTOR_H
 
 #include <handler/IOHandleDescriptor.h>
+#include <zephyr/drivers/gpio.h>
 
 class IOHandleGPIODescriptor : public IOHandleDescriptor {
 public:
-  IOHandleGPIODescriptor(std::string const &paId, forte::core::io::IOMapper::Direction paDirection) :
-    IOHandleDescriptor(paId, paDirection, Gpio) {}
+  IOHandleGPIODescriptor(std::string const &paId, forte::core::io::IOMapper::Direction paDirection,
+    gpio_dt_spec* paGpioSpec, gpio_flags_t paFlags) :
+    IOHandleDescriptor(paId, paDirection, Gpio), mGpioSpec(paGpioSpec), mFlags(paFlags) {}
+
+  gpio_dt_spec* getGpioSpec() const {
+    return mGpioSpec;
+  }
+
+  gpio_flags_t getFlags() const {
+    return mFlags;
+  }
+
+protected:
+  gpio_dt_spec* mGpioSpec;
+  gpio_flags_t mFlags;
 };
 
 #endif // IOHANDLEGPIODESCRIPTOR_H
