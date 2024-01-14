@@ -21,7 +21,7 @@ DEFINE_FIRMWARE_FB(FORTE_ZephyrIO, g_nStringIdZephyrIO)
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataInputNames[] = {g_nStringIdQI, g_nStringIdUpdateInterval};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataInputTypeIds[] = {g_nStringIdBOOL, g_nStringIdTIME};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataOutputNames[] = {g_nStringIdQO, g_nStringIdSTATUS};
-const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataOutputTypeIds[] = {g_nStringIdBOOL, g_nStringIdWSTRING};
+const CStringDictionary::TStringId FORTE_ZephyrIO::scmDataOutputTypeIds[] = {g_nStringIdBOOL, g_nStringIdSTRING};
 const TDataIOID FORTE_ZephyrIO::scmEIWith[] = {0, 1, scmWithListDelimiter};
 const TForteInt16 FORTE_ZephyrIO::scmEIWithIndexes[] = {0};
 const CStringDictionary::TStringId FORTE_ZephyrIO::scmEventInputNames[] = {g_nStringIdINIT};
@@ -53,7 +53,7 @@ void FORTE_ZephyrIO::setInitialValues() {
   var_QI = 0_BOOL;
   var_UpdateInterval = 40000000_TIME;
   var_QO = 0_BOOL;
-  var_STATUS = u""_WSTRING;
+  var_STATUS = u""_STRING;
 }
 
 void FORTE_ZephyrIO::readInputData(const TEventID paEIID) {
@@ -122,11 +122,17 @@ CDataConnection *FORTE_ZephyrIO::getDOConUnchecked(const TPortId paIndex) {
 void FORTE_ZephyrIO::onStartup(CEventChainExecutionThread * const paECET) {
   // Initialize handles
   for (size_t i = 0; i < FORTE_ZephyrIO::numberOfIOs; i++) {
-    std::string id = static_cast<CIEC_WSTRING*>(getDI(FORTE_ZephyrIOBase::initialDIOffset + i))->getValue();
+    const auto id = std::string(*static_cast<CIEC_STRING*>(getDI(FORTE_ZephyrIOBase::initialDIOffset + i)));
     // do not use verbatim, only for reference to copy & paste in FBT instance class:
-    IOHandleGPIODescriptor descr(id, IOMapper::Out);
+    gpio_dt_spec* spec = nullptr;
+    gpio_flags_t flags = 0;
+    if (!spec) {
+      DEVLOG_ERROR("FORTE_ZephyrIO::onStartup: id %s, device spec is null\n", id.c_str());
+      continue;
+    }
+    IOHandleGPIODescriptor descr(id, IOMapper::Out, spec, flags);
     initHandle(&descr);
   }
 
-  started(paECET);
+  FORTE_ZephyrIOBase::onStartup(paECET);
 }

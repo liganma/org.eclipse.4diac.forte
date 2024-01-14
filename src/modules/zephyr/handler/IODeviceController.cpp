@@ -30,10 +30,11 @@ IODeviceController::initHandle(HandleDescriptor *paHandleDescriptor) {
   switch (desc->mType) {
   case IOHandleDescriptor::Gpio: {
     auto gpioDesc = static_cast<IOHandleGPIODescriptor *>(paHandleDescriptor);
-    handle = new IOHandleGPIO(this, gpioDesc->mDirection);
+    handle = new IOHandleGPIO(this, gpioDesc->mDirection, gpioDesc->getGpioSpec(), gpioDesc->getFlags());
     break;
   }
   default:
+    DEVLOG_ERROR("IODeviceController::initHandle: unsupported HandleType.\n");
     handle = nullptr;
     break;
   }

@@ -26,7 +26,8 @@ class IOHandleGPIO : public forte::core::io::IOHandle {
   using IOMapper = forte::core::io::IOMapper;
 
 public:
-  IOHandleGPIO(IODeviceController *paDeviceCtrl, IOMapper::Direction paDirection);
+  IOHandleGPIO(IODeviceController *paDeviceCtrl, IOMapper::Direction paDirection,
+    gpio_dt_spec* paGpioSpec, gpio_flags_t paFlags);
   ~IOHandleGPIO() override;
   void get(CIEC_ANY &) override;
   void set(const CIEC_ANY &) override;
@@ -35,9 +36,18 @@ public:
 protected:
   void onObserver(IOObserver *paObserver) override;
   void dropObserver() override;
+  gpio_dt_spec* getGpioSpec() const { return mGpioSpec; }
 
 private:
-  CIEC_BOOL mLastValue;
+  static void irq_callback(const struct device* dev, struct gpio_callback* cb, uint32_t pins);
+
+  gpio_dt_spec* mGpioSpec;
+  struct gpio_callback_context_t {
+    struct gpio_callback gpio_cb_data;
+    IOHandleGPIO* self;
+  };
+  gpio_callback_context_t mGpioCallbackCtx;
+  bool mLastValue;
 };
 
 #endif // IOHANDLEGPIO_H

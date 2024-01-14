@@ -35,6 +35,17 @@ forte_add_sourcefile_hcpp(types/ZephyrIO_fbt)
 endif(FORTE_IO_ZEPHYR)
 
 #############################################################################
+# ESP32 Ethernet Kit FBs
+#############################################################################
+
+forte_add_io(ESP32ETHERNETKIT "Support for the Esp32EthernetKit board")
+
+if(FORTE_IO_ESP32ETHERNETKIT)
+
+forte_add_sourcefile_hcpp(types/Esp32EthernetKitIO_fbt)
+
+endif(FORTE_IO_ESP32ETHERNETKIT)
+
+#############################################################################
 
 endif("${FORTE_ARCHITECTURE}" STREQUAL "Zephyr")
-

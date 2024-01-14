@@ -3,18 +3,18 @@
  ***
  *** This file was generated using the 4DIAC FORTE Export Filter V1.0.x NG!
  ***
- *** Name: ZephyrIO
- *** Description: Template for Modular IO with boards running Zephyr OS
+ *** Name: Esp32EthernetKitIO
+ *** Description: Template for Modular IO with Esp32EthernetKit board
  *** Version:
- ***     1.0: 2024-01-12/Dirk Kaar -  -
+ ***     1.0: 2024-01-13/Dirk O. Kaar -  -
  *************************************************************************/
 
 #pragma once
 
 #include "ZephyrIOBase.h"
 
-class FORTE_ZephyrIO final : public FORTE_ZephyrIOBase {
-  DECLARE_FIRMWARE_FB(FORTE_ZephyrIO)
+class FORTE_Esp32EthernetKitIO final : public FORTE_ZephyrIOBase {
+  DECLARE_FIRMWARE_FB(FORTE_Esp32EthernetKitIO)
 
   private:
     static const CStringDictionary::TStringId scmDataInputNames[];
@@ -36,15 +36,17 @@ class FORTE_ZephyrIO final : public FORTE_ZephyrIOBase {
     void writeOutputData(TEventID paEIID) override;
     void setInitialValues() override;
 
-    static constexpr size_t numberOfIOs = 0;
+    static constexpr size_t numberOfIOs = 2;
 
   protected:
     void onStartup(CEventChainExecutionThread * const paECET) override;
 
   public:
-    FORTE_ZephyrIO(CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer);
+    FORTE_Esp32EthernetKitIO(CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer);
 
     CIEC_BOOL var_QI;
+    CIEC_STRING var_LED0;
+    CIEC_STRING var_SW0;
     CIEC_TIME var_UpdateInterval;
 
     CIEC_BOOL var_QO;
@@ -56,6 +58,8 @@ class FORTE_ZephyrIO final : public FORTE_ZephyrIOBase {
     CEventConnection conn_INITO;
 
     CDataConnection *conn_QI;
+    CDataConnection *conn_LED0;
+    CDataConnection *conn_SW0;
     CDataConnection *conn_UpdateInterval;
 
     CDataConnection conn_QO;
@@ -67,16 +71,18 @@ class FORTE_ZephyrIO final : public FORTE_ZephyrIOBase {
     CDataConnection **getDIConUnchecked(TPortId) override;
     CDataConnection *getDOConUnchecked(TPortId) override;
 
-    void evt_INIT(const CIEC_BOOL &paQI, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_STRING &paSTATUS) {
+    void evt_INIT(const CIEC_BOOL &paQI, const CIEC_STRING &paLED0, const CIEC_STRING &paSW0, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_STRING &paSTATUS) {
       var_QI = paQI;
+      var_LED0 = paLED0;
+      var_SW0 = paSW0;
       var_UpdateInterval = paUpdateInterval;
       executeEvent(scmEventINITID, nullptr);
       paQO = var_QO;
       paSTATUS = var_STATUS;
     }
 
-    void operator()(const CIEC_BOOL &paQI, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_STRING &paSTATUS) {
-      evt_INIT(paQI, paUpdateInterval, paQO, paSTATUS);
+    void operator()(const CIEC_BOOL &paQI, const CIEC_STRING &paLED0, const CIEC_STRING &paSW0, const CIEC_TIME &paUpdateInterval, CIEC_BOOL &paQO, CIEC_STRING &paSTATUS) {
+      evt_INIT(paQI, paLED0, paSW0, paUpdateInterval, paQO, paSTATUS);
     }
 };
 

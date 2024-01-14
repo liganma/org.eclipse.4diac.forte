@@ -32,12 +32,13 @@ class FORTE_ZephyrIOBase : public forte::core::io::IOConfigFBController {
 
     static constexpr size_t initialDIOffset = 1;
 
+    void onStartup(CEventChainExecutionThread * const paECET) override;
+
   private:
     static constexpr size_t numberOfIOs = 0;
 
     forte::core::io::IODeviceController* createDeviceController(CDeviceExecution& paDeviceExecution) override;
     void setConfig() override;
-    void onStartup(CEventChainExecutionThread * const paECET) override;
 
   public:
     FORTE_ZephyrIOBase(forte::core::CFBContainer &paContainer, const SFBInterfaceSpec *paInterfaceSpec, const CStringDictionary::TStringId paInstanceNameId);

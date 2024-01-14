@@ -36,12 +36,18 @@ void FORTE_ZephyrIOBase::onStartup(CEventChainExecutionThread * const paECET) {
 /*
   // Initialize handles
   for (size_t i = 0; i < FORTE_ZephyrIOBase::numberOfIOs; i++) {
-    std::string id = static_cast<CIEC_WSTRING*>(getDI(FORTE_ZephyrIOBase::initialDIOffset + i))->getValue();
+    const auto id = std::string(*static_cast<CIEC_STRING*>(getDI(FORTE_ZephyrIOBase::initialDIOffset + i)));
     // do not use verbatim, only for reference to copy & paste in FBT instance class:
-    IOHandleGPIODescriptor descr(id, IOMapper::Out);
+    gpio_dt_spec* spec = nullptr;
+    gpio_flags_t flags = 0;
+    if (!spec) {
+      DEVLOG_ERROR("FORTE_ZephyrIO::onStartup: id %s, device spec is null\n", id.c_str());
+      continue;
+    }
+    IOHandleGPIODescriptor descr(id, IOMapper::Out, spec, flags);
     initHandle(&descr);
   }
+*/
 
   started(paECET);
-*/
 }
